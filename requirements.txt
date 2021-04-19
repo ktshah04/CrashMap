@@ -1,0 +1,10 @@
+numpy
+requests
+networkx
+pandas
+ipywidgets
+scikit-learn
+xgboost
+pickle
+flask
+flask_cors
