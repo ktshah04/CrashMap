@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Team 058</title>
+    <!-- Leaflet + d3 libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        .inline-block-child {
+            display: inline-block;
+        }
+
+        #weathermap {
+            height: 800px;
+            width: 1600px;
+            transform: translate(250px,-375px);
+        }
+        #map-legend {
+            height: 200px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <body style="color:white;background-color:gray"></body>
+    <h1 align="center"  style="padding-left: 250px;">Predicting Accident Severity based on Time and Weather Conditions</h1>
+    <h2 align="center"  style="padding-left: 250px;">Select weather conditions and time, then click submit button. Type (press enter key to select an address) or click on the map.</h2>
+    
+
+    <br><br>
+                    
+     
+            <form method="POST">
+
+                <label>State: </label>
+                <select id="state" name="State"></select>
+
+                <br><br>
+
+                <label>Day of the week: </label>
+                <select id="day" name="Day"></select>
+
+                <br><br>
+
+                <label>Hour of the day: </label>
+                <select id="hour" name="Hour"></select>
+                
+                <br><br>
+
+                <label>Sunset/Sunrise: </label>
+                <select id="sun" name="Sun"></select>
+
+                <br><br>
+
+                <label>Weather: </label>
+                <select id="weather" name="Weather"></select>
+                
+                <br><br>
+                
+                <label>Temperature (F): </label>
+                <select id="temperature" name="Temperature"></select>
+
+                <br><br>
+
+                <label>Wind speed (mph): </label>
+                <select id="wind" name="Wind"></select>
+
+                <br><br>
+
+                <label>Rain precipitation (inch): </label>
+                <select id="precipitation" name="Precipitation"></select>
+
+                <br><br>
+
+                <label>Humidity (%): </label>
+                <select id="humidity" name="Humidity"></select>
+
+                <br>
+                
+                <button style="margin:15px;" onclick="submit()">Submit</button>
+                <button style="margin:15px;" onclick="reset()">Reset</button>
+                
+            </form>
+        
+
+
+
+<div id="weathermap"></div>
+<div id="map-legend"></div>
+
+
+<script>
+
+    // d3.select(window).on("load",submit);
+
+    // <p>Select temperature (fahrenheit, -20~100): </p>
+    // <input type="number" name="temperature" value=70>
+    // <p>Select humidity (percent, 10~100): </p>
+    // <input type="number" name="humidity" value=50>
+    // <p>Select wind speed (mph, 0~50): </p>
+    // <input type="number" name="wind" value=10>
+    // <p>Select rain precipitation (inch, 0~1): </p>
+    // <input type="number" name="precipitation" value=0>
+
+    //Initialize select buttons
+    var states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
+    var weather = ['Sunny', 'Cloudy', 'Fog', 'Rain', 'Thunderstorm', 'Snow or Ice']
+    var day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    var sun = ['Sunrise', 'Sunset']
+    var hour = []
+    for (let i = 0; i < 24; i++) {hour.push(i)}
+    var temperature = []
+    for (let i = -20; i < 101; i++) {temperature.push(i)}
+    var humidity = []
+    for (let i = 10; i < 101; i++) {humidity.push(i)}
+    var wind = []
+    for (let i = 0; i < 51; i++) {wind.push(i)}
+    var precipitation = []
+    for (let i = 0; i < 11; i++) {precipitation.push(i/10)}
+
+    d3.select("#weather")
+        .selectAll('options')
+        .data(weather)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#day")
+        .selectAll('options')
+        .data(day)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#state")
+        .selectAll('options')
+        .data(states)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#hour")
+        .selectAll('options')
+        .data(hour)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#sun")
+        .selectAll('options')
+        .data(sun)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#temperature")
+        .selectAll('options')
+        .data(temperature)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#humidity")
+        .selectAll('options')
+        .data(humidity)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#wind")
+        .selectAll('options')
+        .data(wind)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    d3.select("#precipitation")
+        .selectAll('options')
+        .data(precipitation)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d) { return d; })
+
+    // Initialize Map
+    makemap();
+
+    var selectedWeather, selectedDay, selectedHour, selectedSun;
+    var selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
+    var pred;
+
+    d3.select("#weather").on("change", function(d) {
+        selectedWeather = d3.select(this).property("value")})
+
+    d3.select("#day").on("change", function(d) {
+        selectedDay = d3.select(this).property("value")})
+
+    d3.select("#hour").on("change", function(d) {
+        selectedHour = d3.select(this).property("value")})
+
+    d3.select("#sun").on("change", function(d) {
+        selectedSun = d3.select(this).property("value")})
+
+    d3.select("#temperature").on("change", function(d) {
+        selectedTemperature = d3.select(this).property("value")})
+
+    d3.select("#humidity").on("change", function(d) {
+        selectedHumidity = d3.select(this).property("value")})
+
+    d3.select("#wind").on("change", function(d) {
+        selectedWind = d3.select(this).property("value")})
+
+    d3.select("#precipitation").on("change", function(d) {
+        selectedPrecipitation = d3.select(this).property("value")})
+
+    // var inputTemperature, inputHumidity, inputWind, inputPrecipiation;
+    // d3.select("#temperature").on("input", function() {
+    //     inputTemperature = d3.select(this).value})
+    // d3.select("#humidity").on("input", function(d) {
+    //     inputHumidity = d3.select(this).value})
+    // d3.select("#wind").on("input", function(d) {
+    //     inputWind = d3.select(this).value})
+    // d3.select("#precipitation").on("input", function(d) {
+    //     inputPrecipiation = d3.select(this).value})
+
+    // function test() {
+    //     console.log("hello")
+    //     return false;
+    // }
+    
+    d3.json('/data',function(d) {
+            console.log(d)
+            // console.log(d.latitude)
+
+            var geoJSONweatherFeatures = [];
+
+            // Python goes here
+            // Use selectedWeather, selectedDay, selectedHour, selectedSun,
+            // selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
+
+            pred = selectedHour // predicted results from python
+
+            for (let i = 0; i < d.latitude.length; i+=1) {
+                
+                // var curr_color = d3.schemeCategory10[Math.ceil((d.latitude[i] % 1)*10)]
+
+                if (d.predictions[i] == 1) {
+                    var curr_color = "blue"
+                }
+                else {
+                    var curr_color = "orange"
+                }
+                    
+
+                var geoJSONFeature = {
+                    "type": "Feature",
+                    "properties": {
+                        "color":  curr_color,
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [ +d.longitude[i], +d.latitude[i] ]
+                    }
+                };
+                geoJSONweatherFeatures.push(geoJSONFeature);
+            }
+            // .forEach(function(a, i) {
+            //     console.log(a)
+            //     var geoJSONFeature = {
+            //         "type": "Feature",
+            //         "properties": {
+            //             "color":  "blue",
+            //         },
+            //         "geometry": {
+            //             "type": "Point",
+            //             "coordinates": [ +a.Start_Lng, +a.Start_Lat ]
+            //         }
+            //     };
+                
+            // });
+            makeweatherMap(geoJSONweatherFeatures);
+        })
+ 
+
+    function submit() {
+        d3.csv("coordinates.csv", function(error, accidents) {
+            console.log(error)
+            var geoJSONweatherFeatures = [];
+
+            // Python goes here
+            // Use selectedWeather, selectedDay, selectedHour, selectedSun,
+            // selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
+
+            d3.json('/data',function(d) {
+                    console.log(d)
+                })
+
+
+
+            pred = selectedHour // predicted results from python
+
+            accidents.forEach(function(a, i) {
+                var geoJSONFeature = {
+                    "type": "Feature",
+                    "properties": {
+                        "color":  "blue",
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [ +a.Start_Lng, +a.Start_Lat ]
+                    }
+                };
+                geoJSONweatherFeatures.push(geoJSONFeature);
+            });
+            makeweatherMap(geoJSONweatherFeatures);
+        })
+      };
+
+    function reset() { makemap() };
+
+    function makemap() {
+        document.getElementById('weathermap').innerHTML = "<div id='map' style='width: 100%; height: 100%;'></div>";
+        var map       = L.map("map"),
+            bwOsmURL  = "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+            osmAttrs  = "Map data © <a href='http://openstreetmap.org'>OpenStreetMap</a>";
+        var osmTiles = new L.TileLayer(bwOsmURL, {
+            minZoom: 8,
+            maxZoom: 16,
+            attribution: osmAttrs
+        });
+        var nycCoord  = new L.LatLng(40.75, -73.9); // center view on NYC
+        map.setView(nycCoord, 11); // zoom level
+        map.addLayer(osmTiles);
+    };
+
+    function makeweatherMap(geoJSONweatherFeatures) {
+        document.getElementById('weathermap').innerHTML = "<div id='map' style='width: 100%; height: 100%;'></div>";
+        var map = L.map("map"),
+            bwOsmURL = "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+            osmAttrs = "Map data © <a href='http://openstreetmap.org'>OpenStreetMap</a>";
+        var osmTiles = new L.TileLayer(bwOsmURL, {
+            minZoom: 8,
+            maxZoom: 16,
+            attribution: osmAttrs
+        });
+        var nycCoord  = new L.LatLng(40.75, -73.9);
+        map.setView(nycCoord, 11);
+        map.addLayer(osmTiles);
+
+        // Add severity points
+        L.geoJson(geoJSONweatherFeatures, {
+            style: function (feature) {
+                return {
+                    color:       '#000',
+                    opacity:     0,
+                    radius:      5,
+                    fillColor:   feature.properties.color,
+                    fillOpacity: 0.5
+                };
+            },
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng);
+            }
+        }).addTo(map);
+
+        // Reversing the route
+        var ReversablePlan = L.Routing.Plan.extend({
+            createGeocoders: function() {
+                var container = L.Routing.Plan.prototype.createGeocoders.call(this),
+                reverseButton = createButton('↑↓', container);
+                L.DomEvent.on(reverseButton, 'click', function() {
+                    var waypoints = this.getWaypoints();
+                    this.setWaypoints(waypoints.reverse());
+                    }, this);
+                return container;
+              }
+        });
+        var plan = new ReversablePlan([], {
+            geocoder: L.Control.Geocoder.nominatim(),
+              routeWhileDragging: true
+        })
+
+        var control = L.Routing.control({
+          routeWhileDragging: true,
+          geocoder: L.Control.Geocoder.nominatim(),
+          suggest: L.Control.Geocoder.nominatim(),
+          plan: plan
+        }).addTo(map);
+
+        // Adding waypoints by clicking the map
+        function createButton(label, container) {
+            var btn = L.DomUtil.create('button', '', container);
+            btn.setAttribute('type', 'button');
+            btn.innerHTML = label;
+            return btn;
+        }
+        map.on('click', function(e) {
+            var container = L.DomUtil.create('div'),
+                startBtn = createButton('Start from this location', container),
+                destBtn = createButton('Go to this location', container);
+            L.popup()
+                .setContent(container)
+                .setLatLng(e.latlng)
+                .openOn(map);
+                L.DomEvent.on(startBtn, 'click', function() {
+                    control.spliceWaypoints(0, 1, e.latlng);
+                    map.closePopup();
+                });
+                L.DomEvent.on(destBtn, 'click', function() {
+                    control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+                    map.closePopup();
+                });
+        })
+        L.Routing.errorControl(control).addTo(map)
+    };
+
+    // Add legend
+    var legend = d3.select('#map-legend').append('svg')
+        .attr('width', 250)
+        .attr('height', 20)
+    legend.append("circle")
+        .attr("cx", 10)
+        .attr("cy", 10)
+        .attr("r", 4)
+        .attr("fill", "blue")
+    legend.append("circle")
+        .attr("cx", 130)
+        .attr("cy", 10)
+        .attr("r", 4)
+        .attr("fill", "yellow")
+    legend.append("text")
+        .attr("x", 23)
+        .attr("y", 15)
+        .text('high severity')
+    legend.append("text")
+        .attr("x", 143)
+        .attr("y", 15)
+        .text('low severity')
+
+</script>
+</body>
+</html>
