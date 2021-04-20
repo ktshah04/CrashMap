@@ -19,7 +19,7 @@
         #weathermap {
             height: 800px;
             width: 1600px;
-            transform: translate(250px,-375px);
+            transform: translate(250px,-650px);
         }
         #map-legend {
             height: 200px;
@@ -105,10 +105,10 @@
             </form>
         
 
-
-
-<div id="weathermap"></div>
+<br><br><br><br>
 <div id="map-legend"></div>
+<div id="weathermap"></div>
+
 
 
 <script>
@@ -460,24 +460,28 @@
     // Add legend
     var legend = d3.select('#map-legend').append('svg')
         .attr('width', 250)
-        .attr('height', 20)
+        .attr('height', 100)
     legend.append("circle")
-        .attr("cx", 10)
-        .attr("cy", 10)
-        .attr("r", 4)
+        .attr("cx", 210)
+        .attr("cy", 30)
+        .attr("r", 10)
+        .attr("fill", "orange")
+    legend.append("circle")
+        .attr("cx", 210)
+        .attr("cy", 80)
+        .attr("r", 10)
         .attr("fill", "blue")
-    legend.append("circle")
-        .attr("cx", 130)
-        .attr("cy", 10)
-        .attr("r", 4)
-        .attr("fill", "yellow")
     legend.append("text")
-        .attr("x", 23)
-        .attr("y", 15)
+        .attr("x", 10)
+        .attr("y", 40)
+        .attr("fill","white")
+        .style("font-size", "34px")
         .text('high severity')
     legend.append("text")
-        .attr("x", 143)
-        .attr("y", 15)
+        .attr("x", 10)
+        .attr("y", 90)
+        .attr("fill","white")
+        .style("font-size", "34px")
         .text('low severity')
 
 </script>
