@@ -38,10 +38,10 @@
      
             <form method="POST">
 
-                <label>State: </label>
+                <!-- <label>State: </label>
                 <select id="state" name="State"></select>
 
-                <br><br>
+                <br><br> -->
 
                 <label>Day of the week: </label>
                 <select id="day" name="Day"></select>
@@ -140,13 +140,13 @@
         .text(function (d) { return d; })
         .attr("value", function (d) { return d; })
 
-    d3.select("#state")
-        .selectAll('options')
-        .data(states)
-        .enter()
-        .append('option')
-        .text(function (d) { return d; })
-        .attr("value", function (d) { return d; })
+    // d3.select("#state")
+    //     .selectAll('options')
+    //     .data(states)
+    //     .enter()
+    //     .append('option')
+    //     .text(function (d) { return d; })
+    //     .attr("value", function (d) { return d; })
 
     d3.select("#hour")
         .selectAll('options')
@@ -259,10 +259,12 @@
                 // var curr_color = d3.schemeCategory10[Math.ceil((d.latitude[i] % 1)*10)]
 
                 if (d.predictions[i] == 1) {
-                    var curr_color = "blue"
+                    // high severity
+                    var curr_color = "orange"
                 }
                 else {
-                    var curr_color = "orange"
+                    // low severity
+                    var curr_color = "blue"
                 }
                     
 

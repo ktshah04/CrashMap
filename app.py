@@ -163,6 +163,7 @@ def data():
     # data.all_lat = df.values[:,0].tolist()
     # data.all_lng = df.values[:,1].tolist()
     
+    data.state = 'New York'
 
     if data.state != None:
         state_coordinates = df[df['State'] == us_state_abbrev[data.state]]
