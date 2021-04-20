@@ -4,6 +4,6 @@ networkx
 pandas
 ipywidgets
 scikit-learn
-xgboost
+py-xgboost
 flask
 flask_cors

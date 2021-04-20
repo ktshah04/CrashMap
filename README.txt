@@ -9,7 +9,15 @@ app.py (The main python file and data are hosted in the root folder)
 
 2. REQUIREMENTS
    1) Install Python 3.7.X
-   2) Install the packages from requirements.txt (via conda or manually) 
+   2) Install the packages from requirements.txt (via conda or manually)
+
+	******************* IF INSTALLING VIA CONDA **********************
+	navigate to/run the following command from the directory where the
+        requirements.txt is located.
+	
+        >> conda create --name <env_name> --file requirements.txt
+        >> conda activate <env_name>
+        ******************************************************************
 
 3. INSTALLATION
    1) Open a terminal window from within the root of the project folder.
