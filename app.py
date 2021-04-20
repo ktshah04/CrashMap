@@ -78,8 +78,8 @@ weekdays = {
 }
 
 sunrise_sunset = {
-    "Sunrise" : 0,
-    "Sunset"  : 1
+    "Day" : 0,
+    "Night"  : 1
 }
 
 weather_cond = {
@@ -165,7 +165,8 @@ def data():
     
     data.state = 'New York'
 
-    if data.state != None:
+    if data.day_of_week != None:
+
         state_coordinates = df[df['State'] == us_state_abbrev[data.state]]
         state_coordinates = state_coordinates.sample(n=2000)
         data.all_lat = state_coordinates.values[:,0].tolist()

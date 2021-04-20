@@ -28,9 +28,9 @@
     </style>
 </head>
 <body>
-    <body style="color:white;background-color:gray"></body>
-    <h1 align="center"  style="padding-left: 250px;">Predicting Accident Severity based on Time and Weather Conditions</h1>
-    <h2 align="center"  style="padding-left: 250px;">Select weather conditions and time, then click submit button. Type (press enter key to select an address) or click on the map.</h2>
+    <body style="background-color:gray"></body>
+    <h1 align="center"  style="padding-left: 250px; color:white">Predicting Accident Severity based on Time and Weather Conditions</h1>
+    <h2 align="center"  style="padding-left: 250px; color: white">Select weather conditions and time, then click submit button. Type (press enter key to select an address) or click on the map.</h2>
     
 
     <br><br>
@@ -43,42 +43,42 @@
 
                 <br><br> -->
 
-                <label>Day of the week: </label>
+                <label style="color: white">Day of the week: </label>
                 <select id="day" name="Day"></select>
 
                 <br><br>
 
-                <label>Hour of the day: </label>
+                <label style="color: white">Hour of the day: </label>
                 <select id="hour" name="Hour"></select>
                 
                 <br><br>
 
-                <label>Sunset/Sunrise: </label>
+                <label style="color: white">Day/Night: </label>
                 <select id="sun" name="Sun"></select>
 
                 <br><br>
 
-                <label>Weather: </label>
+                <label style="color: white">Weather: </label>
                 <select id="weather" name="Weather"></select>
                 
                 <br><br>
                 
-                <label>Temperature (F): </label>
+                <label style="color: white">Temperature (F): </label>
                 <select id="temperature" name="Temperature"></select>
 
                 <br><br>
 
-                <label>Wind speed (mph): </label>
+                <label style="color: white">Wind speed (mph): </label>
                 <select id="wind" name="Wind"></select>
 
                 <br><br>
 
-                <label>Rain precipitation (inch): </label>
+                <label style="color: white">Rain precipitation (inch): </label>
                 <select id="precipitation" name="Precipitation"></select>
 
                 <br><br>
 
-                <label>Humidity (%): </label>
+                <label style="color: white">Humidity (%): </label>
                 <select id="humidity" name="Humidity"></select>
 
                 <br>
@@ -112,7 +112,7 @@
     var states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
     var weather = ['Sunny', 'Cloudy', 'Fog', 'Rain', 'Thunderstorm', 'Snow or Ice']
     var day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    var sun = ['Sunrise', 'Sunset']
+    var sun = ['Day', 'Night']
     var hour = []
     for (let i = 0; i < 24; i++) {hour.push(i)}
     var temperature = []
@@ -202,6 +202,72 @@
     var selectedWeather, selectedDay, selectedHour, selectedSun;
     var selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
     var pred;
+    
+    d3.json('/data',function(d) {
+            console.log(d)
+            // console.log(d.latitude)
+            selectedData = d 
+            var geoJSONweatherFeatures = [];
+
+            // Python goes here
+            // Use selectedWeather, selectedDay, selectedHour, selectedSun,
+            // selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
+
+            // pred = selectedHour // predicted results from python
+
+            for (let i = 0; i < d.latitude.length; i+=1) {
+                
+                // var curr_color = d3.schemeCategory10[Math.ceil((d.latitude[i] % 1)*10)]
+
+                if (d.predictions[i] == 1) {
+                    // high severity
+                    var curr_color = "orange"
+                }
+                else {
+                    // low severity
+                    var curr_color = "blue"
+                }
+                    
+
+                var geoJSONFeature = {
+                    "type": "Feature",
+                    "properties": {
+                        "color":  curr_color,
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [ +d.longitude[i], +d.latitude[i] ]
+                    }
+                };
+                geoJSONweatherFeatures.push(geoJSONFeature);
+            }
+            makeweatherMap(geoJSONweatherFeatures);
+
+            
+            let selectedWeather = document.getElementById('weather')
+            selectedWeather.value = d.weather
+
+            let selectedDay = document.getElementById('day')
+            selectedDay.value = d.day_of_week
+
+            let selectedHour = document.getElementById('hour')
+            selectedHour.value = d.hour
+
+            let selectedSun = document.getElementById('sun')
+            selectedSun.value = d.sun
+
+            let selectedTemperature = document.getElementById('temperature')
+            selectedTemperature.value = d.temperature
+
+            let selectedHumidity = document.getElementById('humidity')
+            selectedHumidity.value = d.humidity
+
+            let selectedWind = document.getElementById('wind')
+            selectedWind.value = d.wind
+
+            let selectedPrecipitation = document.getElementById('precipitation')
+            selectedPrecipitation.value = d.precipitation
+        })
 
     d3.select("#weather").on("change", function(d) {
         selectedWeather = d3.select(this).property("value")})
@@ -241,61 +307,6 @@
     //     console.log("hello")
     //     return false;
     // }
-    
-    d3.json('/data',function(d) {
-            console.log(d)
-            // console.log(d.latitude)
-
-            var geoJSONweatherFeatures = [];
-
-            // Python goes here
-            // Use selectedWeather, selectedDay, selectedHour, selectedSun,
-            // selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
-
-            pred = selectedHour // predicted results from python
-
-            for (let i = 0; i < d.latitude.length; i+=1) {
-                
-                // var curr_color = d3.schemeCategory10[Math.ceil((d.latitude[i] % 1)*10)]
-
-                if (d.predictions[i] == 1) {
-                    // high severity
-                    var curr_color = "orange"
-                }
-                else {
-                    // low severity
-                    var curr_color = "blue"
-                }
-                    
-
-                var geoJSONFeature = {
-                    "type": "Feature",
-                    "properties": {
-                        "color":  curr_color,
-                    },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [ +d.longitude[i], +d.latitude[i] ]
-                    }
-                };
-                geoJSONweatherFeatures.push(geoJSONFeature);
-            }
-            // .forEach(function(a, i) {
-            //     console.log(a)
-            //     var geoJSONFeature = {
-            //         "type": "Feature",
-            //         "properties": {
-            //             "color":  "blue",
-            //         },
-            //         "geometry": {
-            //             "type": "Point",
-            //             "coordinates": [ +a.Start_Lng, +a.Start_Lat ]
-            //         }
-            //     };
-                
-            // });
-            makeweatherMap(geoJSONweatherFeatures);
-        })
  
 
     function submit() {
