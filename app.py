@@ -91,7 +91,7 @@ weather_cond = {
     "Thunderstorm": [0,0,0,0,1]
 }
 
-df = pd.read_csv('US_Accidents_Dec20_Coordinates.csv')
+df = pd.read_csv('US_Accidents_Dec20_Coordinates_NY.csv')
 
 # selectedWeather, selectedDay, selectedHour, selectedSun,
 # selectedTemperature, selectedHumidity, selectedWind, selectedPrecipitation;
