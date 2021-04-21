@@ -168,7 +168,7 @@ def data():
     if data.day_of_week != None:
 
         state_coordinates = df[df['State'] == us_state_abbrev[data.state]]
-        state_coordinates = state_coordinates.sample(n=2000)
+        state_coordinates = state_coordinates.sample(n=2500,random_state=np.random.RandomState())
         data.all_lat = state_coordinates.values[:,0].tolist()
         data.all_lng = state_coordinates.values[:,1].tolist()
 
